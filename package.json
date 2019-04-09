@@ -1,0 +1,31 @@
+{
+  "name": "parallel-each",
+  "version": "1.0.0",
+  "description": "A non-blocking, asynchronous, parallel implementation of forEach in JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/garrickthurston/parallel-each.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/garrickthurston/parallel-each/issues"
+  },
+  "homepage": "https://github.com/garrickthurston/parallel-each#readme",
+  "devDependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "babel-core": "^6.26.3",
+    "babel-polyfill": "^6.26.0",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.2",
+    "sinon": "^7.3.1",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
+  }
+}
