@@ -1,10 +1,11 @@
 {
   "name": "parallel-each",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "A non-blocking, asynchronous, parallel implementation of forEach in JS",
-  "main": "index.js",
+  "main": "src/parallel-each.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --require @babel/register --require @babel/polyfill ./test/**/*.spec.js",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -18,12 +19,17 @@
   },
   "homepage": "https://github.com/garrickthurston/parallel-each#readme",
   "devDependencies": {
+    "@babel/cli": "^7.4.3",
     "@babel/core": "^7.4.3",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/polyfill": "^7.4.3",
     "@babel/preset-env": "^7.4.3",
-    "babel-core": "^6.26.3",
-    "babel-polyfill": "^6.26.0",
+    "@babel/register": "^7.4.0",
+    "babel-loader": "^8.0.5",
     "chai": "^4.2.0",
+    "clean-webpack-plugin": "^2.0.1",
     "mocha": "^6.1.2",
+    "path": "^0.12.7",
     "sinon": "^7.3.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0"
