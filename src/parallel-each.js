@@ -1,65 +1,84 @@
-import callbackWrapper from './callback-wrapper';
+import { EventEmitter } from 'events';
 
-class ParallelEach {
-    processArray = [];
-    availableIndexes = [];
+function ParallelEach(array, callback, chunkSize, logError, finishedCallback) {
+    this.callback = callback;
+    this.finishedCallback = finishedCallback
 
-    constructor(array, callback, chunkSize) {
-        this.array = array || [];
-        this.callback = callback || (() => {});
-        this.chunkSize = chunkSize || 1;
+    this.array = array || [];
+    this.chunkSize = chunkSize || 1;
+    this.logError = logError || false;
+    
+    this.ee = new EventEmitter();
+    this.processArray = [];
+    this.availableIndexes = [];
+    this.erroredItems = [];
 
-        for (var i = 0; i < (chunkSize < array.length ? chunkSize : array.length); i++) {
-            this.processArray.push({
-                index: i,
-                processing: false,
-                item: array[i]
+    for (var i = 0; i < (chunkSize < array.length ? chunkSize : array.length); i++) {
+        this.processArray.push({
+            index: i,
+            processing: false,
+            item: array[i]
+        });
+    }
+
+    if (chunkSize < array.length) {
+        for (var i = chunkSize; i < array.length; i++) {
+            this.availableIndexes.push(i);
+        }
+    }
+
+    this.processCallback = (item) => {
+        Promise.resolve(this.callback(item.item, item.index, this.array)).then(() => {
+            this.processArray = this.processArray.filter(val => item !== val);
+            var nextIndex = null;
+            if (this.availableIndexes && this.availableIndexes.length) {
+                nextIndex = this.availableIndexes.splice(0, 1)[0];
+                this.processArray.push({
+                    index: nextIndex,
+                    processing: false,
+                    item: this.array[nextIndex]
+                });
+            }
+
+            this.ee.emit('itemComplete', nextIndex);
+        }).catch(ex => {
+            this.ee.emit('itemError', { item, ex });
+        });
+    };
+
+    this.process = () => new Promise((resolve, reject) => {
+        this.ee.on('itemError', (e) => {
+            this.erroredItems.push({
+                item: e.item.item,
+                index: e.item.index,
+                exception: e.ex
             });
-        }
+        });
 
-        if (chunkSize < array.length) {
-            for (var i = chunkSize; i < array.length; i++) {
-                this.availableIndexes.push(i);
+        this.ee.on('itemComplete', (nextIndex = null) => {
+            if (nextIndex === null && !this.processArray.length) {
+                return resolve(this.erroredItems);
             }
-        }
-
-        this.process = this.process.bind(this);
-
-        return this.process();
-    }
-
-    async process() {
-        if (!this.processArray.length && !this.availableIndexes.length) {
-            return;
-        }
-
-        var toProcess = this.processArray.filter(item => !item.processing);
-        for (var i = 0; i < toProcess.length; i++) {
-            var item = toProcess[i];
-            item.processing = true;
-
-            try {
-                const wrapper = await callbackWrapper(this.callback, item.item, item.index, this.array);
-
-                this.processArray.splice(wrapper.index, 1);
-
-                if (this.availableIndexes) {
-                    const availableIndex = this.availableIndexes.splice(0, 1)[0];
-                    this.processArray.push({
-                        index: availableIndex,
-                        processing: false,
-                        item: this.array[availableIndex]
-                    });
+            if (nextIndex !== null) {
+                var nextItem = this.processArray.find(item => item.index === nextIndex);
+                if (nextItem) {
+                    this.processCallback(nextItem);
                 }
-            } catch (e) {
-
             }
+        });
 
-            this.process();
+        if (this.processArray.length) {
+            for (var i = 0; i < this.processArray.length; i++) {
+                this.processCallback(this.processArray[i]);
+            }
+        } else {
+            this.ee.emit('itemComplete');
         }
-    }
-}
+    });
 
-const peach = (array, callback, chunkSize = 1) => new ParallelEach(array, callback, chunkSize);
+    return this.process();
+};
+
+const peach = (array, callback, chunkSize = 1, logError = false, finishedCallback = null) => new ParallelEach(array, callback, chunkSize, logError, finishedCallback);
 
 export default peach;

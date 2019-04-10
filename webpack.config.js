@@ -3,6 +3,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
     context: path.join(__dirname),
+    //entry: ['./src/parallel-each.js', './index.js'],
     entry: './src/parallel-each.js',
     output: {
         filename: 'parallel-each.js',
@@ -13,21 +14,12 @@ module.exports = {
         rules: [{
             test: /\.js/,
             exclude: /(node_modules)/,
-            use: ['babel-loader'],
-        //     options: {
-        //         presets: [
-        //             '@babel/preset-env',
-        //             {
-        //                 plugins: [
-        //                     '@babel/plugin-proposal-class-properties'
-        //                 ]
-        //             }
-        //         ]
-        //     },
+            use: ['babel-loader']
         }]
     },
     plugins: [
         new CleanWebpackPlugin()
     ],
-    mode: 'production'
+    mode: 'production',
+    //devtool: 'inline-source-map'
 };
