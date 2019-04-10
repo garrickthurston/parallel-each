@@ -1,10 +1,10 @@
 {
   "name": "parallel-each",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "description": "A non-blocking, asynchronous, parallel implementation of forEach in JS",
-  "main": "src/parallel-each.js",
+  "main": "dist/parallel-each.js",
   "scripts": {
-    "test": "mocha --require @babel/register --require @babel/polyfill ./test/**/*.spec.js",
+    "test": "mocha --require @babel/register --require @babel/polyfill ./test/**/*.spec.js && cd example && npm run test",
     "build": "webpack"
   },
   "repository": {
@@ -33,5 +33,8 @@
     "sinon": "^7.3.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0"
-  }
+  },
+  "files": [
+    "dist/parallel-each.js"
+  ]
 }
