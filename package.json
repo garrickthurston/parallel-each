@@ -1,7 +1,7 @@
 {
   "name": "parallel-each",
-  "version": "1.0.8",
-  "description": "A parallel, asynchronous implementation of forEach/map in ES6 with a configurable maximum degree of parallelism.",
+  "version": "1.0.9",
+  "description": "A parallel, asynchronous implementation of forEach in ES6 with a configurable maximum degree of parallelism.",
   "main": "parallel-each.js",
   "scripts": {
     "test": "mocha --require @babel/register --require @babel/polyfill ./test/**/*.spec.js"

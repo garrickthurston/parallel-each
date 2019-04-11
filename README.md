@@ -1,5 +1,5 @@
 # parallel-each
-A parallel, asynchronous implementation of forEach/map in ES6 with a configurable maximum degree of parallelism.
+A parallel, asynchronous implementation of forEach in ES6 with a configurable maximum degree of parallelism.
 
 Excellent for use in API integrations (to avoid rate limiting) or parallel database processing (via connection pool for instance).
 
