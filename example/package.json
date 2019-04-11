@@ -2,14 +2,10 @@
   "name": "parallel-each-examples",
   "version": "0.0.0",
   "description": "Examples uses of the parallel-each package",
-  "main": "examples.js",
   "scripts": {
     "build": "webpack",
     "dev": "webpack --watch"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.4.3",
     "@babel/core": "^7.4.3",
@@ -20,7 +16,7 @@
     "babel-loader": "^8.0.5",
     "clean-webpack-plugin": "^2.0.1",
     "html-webpack-plugin": "^3.2.0",
-    "parallel-each": "^0.2.9",
+    "parallel-each": "^1.0.6",
     "path": "^0.12.7",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0"

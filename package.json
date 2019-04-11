@@ -1,7 +1,7 @@
 {
   "name": "parallel-each",
-  "version": "0.2.9",
-  "description": "A non-blocking, asynchronous, parallel implementation of forEach in JS",
+  "version": "1.0.6",
+  "description": "A parallel, asynchronous implementation of forEach/map in ES6 with a configurable maximum degree of parallelism.",
   "main": "parallel-each.js",
   "scripts": {
     "test": "mocha --require @babel/register --require @babel/polyfill ./test/**/*.spec.js"
@@ -10,8 +10,22 @@
     "type": "git",
     "url": "git+https://github.com/garrickthurston/parallel-each.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "async",
+    "forEach",
+    "each",
+    "map",
+    "asynchronous",
+    "iteration",
+    "iterate",
+    "loop",
+    "parallel",
+    "concurrent",
+    "array",
+    "flow",
+    "max-degrees-of-parallelism"
+  ],
+  "author": "Garrick Thurston",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/garrickthurston/parallel-each/issues"
