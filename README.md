@@ -41,7 +41,7 @@ peach(collection, async (_, i) => {
 
     sum += i + 1;
 }, 10).then(() => {
-    var processed = (sum === actualSum;
+    var processed = (sum === actualSum);
 });
 ```
 
