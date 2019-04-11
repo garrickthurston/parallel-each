@@ -3,11 +3,11 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
     context: path.join(__dirname),
-    entry: ['./src/parallel-each.js', './index.js'],
-    //entry: './src/parallel-each.js',
+    //entry: ['./src/parallel-each.js', './index.js'],
+    entry: './src/parallel-each.js',
     output: {
-        filename: '[name].js',
-        //filename: 'parallel-each.js',
+        //filename: '[name].js',
+        filename: 'parallel-each.js',
         publicPath: '/dist/',
         path: path.resolve(__dirname, 'dist')
     },
@@ -21,7 +21,7 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin()
     ],
-    mode: 'development',
-    devtool: 'inline-source-map',
-    //mode: 'production'
+    //mode: 'development',
+    //devtool: 'inline-source-map',
+    mode: 'production'
 };
