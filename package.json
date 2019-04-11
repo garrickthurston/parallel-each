@@ -1,6 +1,6 @@
 {
   "name": "parallel-each",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A parallel, asynchronous implementation of forEach/map in ES6 with a configurable maximum degree of parallelism.",
   "main": "parallel-each.js",
   "scripts": {
