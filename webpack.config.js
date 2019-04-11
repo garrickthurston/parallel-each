@@ -6,6 +6,7 @@ module.exports = {
     //entry: ['./src/parallel-each.js', './index.js'],
     entry: './src/parallel-each.js',
     output: {
+        //filename: '[name].js',
         filename: 'parallel-each.js',
         publicPath: '/dist/',
         path: path.resolve(__dirname, 'dist')
@@ -20,6 +21,7 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin()
     ],
-    mode: 'production',
-    //devtool: 'inline-source-map'
+    //mode: 'development',
+    //devtool: 'inline-source-map',
+    mode: 'production'
 };

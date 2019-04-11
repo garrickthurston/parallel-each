@@ -16,7 +16,6 @@ function ParallelEach(array, callback, chunkSize, logError, finishedCallback) {
     for (var i = 0; i < (chunkSize < array.length ? chunkSize : array.length); i++) {
         this.processArray.push({
             index: i,
-            processing: false,
             item: array[i]
         });
     }
@@ -27,24 +26,25 @@ function ParallelEach(array, callback, chunkSize, logError, finishedCallback) {
         }
     }
 
-    this.processCallback = (item) => {
-        Promise.resolve(this.callback(item.item, item.index, this.array)).then(() => {
-            this.processArray = this.processArray.filter(val => item !== val);
-            var nextIndex = null;
-            if (this.availableIndexes && this.availableIndexes.length) {
-                nextIndex = this.availableIndexes.splice(0, 1)[0];
-                this.processArray.push({
-                    index: nextIndex,
-                    processing: false,
-                    item: this.array[nextIndex]
-                });
-            }
-
-            this.ee.emit('itemComplete', nextIndex);
-        }).catch(ex => {
+    this.processCallback = (item) => new Promise((resolve, reject) => {
+        Promise.resolve(this.callback(item.item, item.index, this.array)).catch((ex) => { 
             this.ee.emit('itemError', { item, ex });
-        });
-    };
+        }).finally(resolve);
+    }).catch((ex) => {
+        this.ee.emit('itemError', { item, ex });
+    }).finally(() => {
+        this.processArray = this.processArray.filter(val => item !== val);
+        var nextIndex = null;
+        if (this.availableIndexes && this.availableIndexes.length) {
+            nextIndex = this.availableIndexes.splice(0, 1)[0];
+            this.processArray.push({
+                index: nextIndex,
+                item: this.array[nextIndex]
+            });
+        }
+
+        this.ee.emit('itemComplete', nextIndex);
+    });
 
     this.process = () => new Promise((resolve, reject) => {
         this.ee.on('itemError', (e) => {
@@ -53,6 +53,18 @@ function ParallelEach(array, callback, chunkSize, logError, finishedCallback) {
                 index: e.item.index,
                 exception: e.ex
             });
+
+            this.processArray = this.processArray.filter(val => e.item !== val);
+            var nextIndex = null;
+            if (this.availableIndexes && this.availableIndexes.length) {
+                nextIndex = this.availableIndexes.splice(0, 1)[0];
+                this.processArray.push({
+                    index: nextIndex,
+                    item: this.array[nextIndex]
+                });
+            }
+
+            this.ee.emit('itemComplete', nextIndex);
         });
 
         this.ee.on('itemComplete', (nextIndex = null) => {
@@ -79,6 +91,8 @@ function ParallelEach(array, callback, chunkSize, logError, finishedCallback) {
     return this.process();
 };
 
-const peach = (array, callback, chunkSize = 1, logError = false, finishedCallback = null) => new ParallelEach(array, callback, chunkSize, logError, finishedCallback);
+const peach = (array, callback, chunkSize = 1, logError = false, finishedCallback = null) => {
+    return new ParallelEach(array, callback, chunkSize, logError, finishedCallback);
+};
 
 export default peach;

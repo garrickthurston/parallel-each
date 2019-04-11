@@ -21,141 +21,529 @@ const getCollectionByPowerOf10 = (power = 1) => {
     return collection;
 };
 
-describe('Parallel-Each', () => {
-    describe('should traverse through a collection and have identical results regardless of parallelism', () => {
-        it('with sync callback', async () => {
+const asyncFn = () => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve();
+    }, 1);
+});
+
+const asyncErrorFn = () => new Promise((_, reject) => {
+    setTimeout(() => {
+        reject(new Error());
+    });
+});
+
+describe('Parallel-Each', function () {
+    this.timeout(0);
+
+    describe('should traverse through a collection and have identical results', () => {
+        describe('with sync callback', () => {
             const power = 4;
             const collection = getCollectionByPowerOf10(power);
+            const actualSum = (collection.length) * (collection.length + 1) / 2;
 
-            const actualSum = (collection.length) * (collection.length + 1) / 2
+            it('at one parallelism', async () => {
+                var sum = 0;
+                await peach(collection, (_, i) => {
+                    sum += i + 1;
+                });
+                expect(sum).to.equal(actualSum);
+            });
 
-            var sumAtOneParallel = 0;
-            await peach(collection, (item, i) => {
-                sumAtOneParallel += i + 1;
-            }, 1);
-            expect(sumAtOneParallel).to.equal(actualSum);
+            it('at ten parallelism', async () => {
+                var sum = 0;
+                await peach(collection, (_, i) => {
+                    sum += i + 1;
+                }, 10);
+                expect(sum).to.equal(actualSum);
+            });
 
-            var sumAtTenParallel = 0;
-            await peach(collection, (item, i) => {
-                sumAtTenParallel += i + 1;
-            }, 10);
-            expect(sumAtTenParallel).to.equal(actualSum);
+            it('at hundred parallelism', async () => {
+                var sum = 0;
+                await peach(collection, (_, i) => {
+                    sum += i + 1;
+                }, 100);
+                expect(sum).to.equal(actualSum);
+            });
 
-            var sumAtHundredParallel = 0;
-            await peach(collection, (item, i) => {
-                sumAtHundredParallel += i + 1;
-            }, 10);
-            expect(sumAtHundredParallel).to.equal(actualSum);
-
-            var sumAtThousandParallel = 0;
-            await peach(collection, (item, i) => {
-                sumAtThousandParallel += i + 1;
-            }, 10);
-            expect(sumAtThousandParallel).to.equal(actualSum);
+            it('at thousand parallelism', async () => {
+                var sum = 0;
+                await peach(collection, (_, i) => {
+                    sum += i + 1;
+                }, 1000);
+                expect(sum).to.equal(actualSum);
+            });
         });
 
-        it('with async callback', async () => {
-            await peach([], () => {}, 20);
+        describe('with async callback', () => {
+            const power = 3;
+            const collection = getCollectionByPowerOf10(power);
+            const actualSum = (collection.length) * (collection.length + 1) / 2;
 
-            expect(true).to.equal(true);
+            it('at one parallelism', async () => {
+                var sum = 0;
+                await peach(collection, async (_, i) => {
+                    await asyncFn();
+    
+                    sum += i + 1;
+                });
+                expect(sum).to.equal(actualSum);
+            });
+
+            it('at ten parallelism', async () => {
+                var sum = 0;
+                await peach(collection, async (_, i) => {
+                    await asyncFn();
+    
+                    sum += i + 1;
+                }, 10);
+                expect(sum).to.equal(actualSum);
+            });
+
+            it('at hundred parallelism', async () => {
+                var sum = 0;
+                await peach(collection, async (_, i) => {
+                    await asyncFn();
+    
+                    sum += i + 1;
+                }, 100);
+                expect(sum).to.equal(actualSum);
+            });
         });
     });
 
     describe('should traverse through a parent collection and child collection in callback', () => {
-        it('sync', () => {
-            peach([], () => {}, 20);
+        const power = 3;
+        const parentCollection = getCollectionByPowerOf10(power);
+        const childCollection = getCollectionByPowerOf10(1);
+        const actualSum = ((parentCollection.length) * (parentCollection.length + 1) / 2) 
+            + (parentCollection.length * (childCollection.length) * (childCollection.length + 1) / 2);
 
-            expect(true).to.equal(true);
+        describe('with sync parent callback and sync child callback', () => {
+            it('at one parallelism', async () => {
+                var sum = 0;
+                await peach(parentCollection, (_, i) => {
+                    sum += i + 1;
+
+                    var childSum = 0;
+                    peach(childCollection, (__, j) => {
+                        childSum += j + 1;
+                    }, 10).then(() => {
+                        sum += childSum;
+                    });
+                });
+                expect(sum).to.equal(actualSum);
+            });
+
+            it('at ten parallelism', async () => {
+                var sum = 0;
+                await peach(parentCollection, (_, i) => {
+                    sum += i + 1;
+
+                    var childSum = 0;
+                    peach(childCollection, (__, j) => {
+                        childSum += j + 1;
+                    }, 10).then(() => {
+                        sum += childSum;
+                    });
+                }, 10);
+                expect(sum).to.equal(actualSum);
+            });
+
+            it('at hundred parallelism', async () => {
+                var sum = 0;
+                await peach(parentCollection, (_, i) => {
+                    sum += i + 1;
+
+                    var childSum = 0;
+                    peach(childCollection, (__, j) => {
+                        childSum += j + 1;
+                    }, 10).then(() => {
+                        sum += childSum;
+                    });
+                }, 100);
+                expect(sum).to.equal(actualSum);
+            });
         });
 
-        it('async', async () => {
-            await peach([], () => {}, 20);
+        describe('with async parent callback and sync child callback', () => {
+            it('at one parallelism', async () => {
+                var sum = 0;
+                await peach(parentCollection, async (_, i) => {
+                    await asyncFn();
+    
+                    sum += i + 1;
+    
+                    var childSum = 0;
+                    await peach(childCollection, (__, j) => {
+                        childSum += j + 1;
+                    }, 10)
+    
+                    sum += childSum;
+                });
+                expect(sum).to.equal(actualSum);
+            });
 
-            expect(true).to.equal(true);
+            it('at ten parallelism', async () => {
+                var sum = 0;
+                await peach(parentCollection, async (_, i) => {
+                    await asyncFn();
+    
+                    sum += i + 1;
+    
+                    var childSum = 0;
+                    await peach(childCollection, (__, j) => {
+                        childSum += j + 1;
+                    }, 10)
+    
+                    sum += childSum;
+                }, 10);
+                expect(sum).to.equal(actualSum);
+            });
+
+            it('at hundred parallelism', async () => {
+                var sum = 0;
+                await peach(parentCollection, async (_, i) => {
+                    await asyncFn();
+    
+                    sum += i + 1;
+    
+                    var childSum = 0;
+                    await peach(childCollection, (__, j) => {
+                        childSum += j + 1;
+                    }, 10)
+    
+                    sum += childSum;
+                }, 10);
+                expect(sum).to.equal(actualSum);
+            });
+        });
+
+        describe('with async parent callback and async child callback', () => {
+            it('at one parallelism', async () => {
+                var sum = 0;
+                await peach(parentCollection, async (_, i) => {
+                    sum += i + 1;
+    
+                    var childSum = 0;
+                    await peach(childCollection, async (__, j) => {
+                        await asyncFn();
+    
+                        childSum += j + 1;
+                    }, 10)
+                    
+                    sum += childSum;
+                });
+                expect(sum).to.equal(actualSum);
+            });
+
+            it('at ten parallelism', async () => {
+                var sum = 0;
+                await peach(parentCollection, async (_, i) => {
+                    sum += i + 1;
+    
+                    var childSum = 0;
+                    await peach(childCollection, async (__, j) => {
+                        await asyncFn();
+    
+                        childSum += j + 1;
+                    }, 10)
+                    
+                    sum += childSum;
+                }, 10);
+                expect(sum).to.equal(actualSum);
+            });
+
+            it('at hundred parallelism', async () => {
+                var sum = 0;
+                await peach(parentCollection, async (_, i) => {
+                    sum += i + 1;
+    
+                    var childSum = 0;
+                    await peach(childCollection, async (__, j) => {
+                        await asyncFn();
+    
+                        childSum += j + 1;
+                    }, 10)
+                    
+                    sum += childSum;
+                }, 100);
+                expect(sum).to.equal(actualSum);
+            });
         });
     });
 
-    describe('should expose error in callback to calling function', () => {
-        it('sync', () => {
-            peach([], () => {}, 20);
+    describe('should swallow then expose error in callback to calling function', () => {
+        const power = 4;
+        const collection = getCollectionByPowerOf10(power);
+        const actualSum = (collection.length) * (collection.length + 1) / 2;
+        const oneErrorSum = actualSum - 1;
+        const manyErrorsSum = (actualSum / 2) + (collection.length / 4);
+        const oneErrorTotal = 1;
+        const manyErrorsTotal = collection.length / 2;
 
-            expect(true).to.equal(true);
+        describe('with sync callback', () => {
+            describe('at one parallelism', () => {
+                it('with one callback error', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, (_, i) => {
+                        if (i === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    });
+                    expect(sum).to.equal(oneErrorSum);
+                    expect(erroredItems.length).to.equal(oneErrorTotal);
+                });
+
+                it('with many callback errore', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, (_, i) => {
+                        if (i % 2 === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    });
+                    expect(sum).to.equal(manyErrorsSum);
+                    expect(erroredItems.length).to.equal(manyErrorsTotal);
+                });
+            });
+            
+            describe('at ten parallelism', () => {
+                it('with one callback error', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, (_, i) => {
+                        if (i === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 10);
+                    expect(sum).to.equal(oneErrorSum);
+                    expect(erroredItems.length).to.equal(oneErrorTotal);
+                });
+
+                it('with many callback errore', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, (_, i) => {
+                        if (i % 2 === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 10);
+                    expect(sum).to.equal(manyErrorsSum);
+                    expect(erroredItems.length).to.equal(manyErrorsTotal);
+                });
+            });
+
+            describe('at hundred parallelism', () => {
+                it('with one callback error', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, (_, i) => {
+                        if (i === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 100);
+                    expect(sum).to.equal(oneErrorSum);
+                    expect(erroredItems.length).to.equal(oneErrorTotal);
+                });
+
+                it('with many callback errore', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, (_, i) => {
+                        if (i % 2 === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 100);
+                    expect(sum).to.equal(manyErrorsSum);
+                    expect(erroredItems.length).to.equal(manyErrorsTotal);
+                });
+            });
+
+            describe('at thousand parallelism', () => {
+                it('with one callback error', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, (_, i) => {
+                        if (i === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 1000);
+                    expect(sum).to.equal(oneErrorSum);
+                    expect(erroredItems.length).to.equal(oneErrorTotal);
+                });
+
+                it('with many callback errore', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, (_, i) => {
+                        if (i % 2 === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 1000);
+                    expect(sum).to.equal(manyErrorsSum);
+                    expect(erroredItems.length).to.equal(manyErrorsTotal);
+                });
+            });
         });
 
-        it('async', async () => {
-            await peach([], () => {}, 20);
+        describe('with async callback', () => {
+            describe('at one parallelism', () => {
+                it('with one callback error', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, async (_, i) => {
+                        await asyncFn();
 
-            expect(true).to.equal(true);
+                        if (i === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    });
+                    expect(sum).to.equal(oneErrorSum);
+                    expect(erroredItems.length).to.equal(oneErrorTotal);
+                });
+
+                it('with many callback errore', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, async (_, i) => {
+                        await asyncFn();
+                        
+                        if (i % 2 === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    });
+                    expect(sum).to.equal(manyErrorsSum);
+                    expect(erroredItems.length).to.equal(manyErrorsTotal);
+                });
+            });
+            
+            describe('at ten parallelism', () => {
+                it('with one callback error', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, async (_, i) => {
+                        await asyncFn();
+                        
+                        if (i === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 10);
+                    expect(sum).to.equal(oneErrorSum);
+                    expect(erroredItems.length).to.equal(oneErrorTotal);
+                });
+
+                it('with many callback errore', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, async (_, i) => {
+                        await asyncFn();
+                        
+                        if (i % 2 === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 10);
+                    expect(sum).to.equal(manyErrorsSum);
+                    expect(erroredItems.length).to.equal(manyErrorsTotal);
+                });
+            });
+
+            describe('at hundred parallelism', () => {
+                it('with one callback error', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, async (_, i) => {
+                        await asyncFn();
+                        
+                        if (i === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 100);
+                    expect(sum).to.equal(oneErrorSum);
+                    expect(erroredItems.length).to.equal(oneErrorTotal);
+                });
+
+                it('with many callback errore', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, async (_, i) => {
+                        await asyncFn();
+                        
+                        if (i % 2 === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 100);
+                    expect(sum).to.equal(manyErrorsSum);
+                    expect(erroredItems.length).to.equal(manyErrorsTotal);
+                });
+            });
+
+            describe('at thousand parallelism', () => {
+                it('with one callback error', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, async (_, i) => {
+                        await asyncFn();
+                        
+                        if (i === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 1000);
+                    expect(sum).to.equal(oneErrorSum);
+                    expect(erroredItems.length).to.equal(oneErrorTotal);
+                });
+
+                it('with many callback errore', async () => {
+                    var sum = 0;
+                    var erroredItems = await peach(collection, async (_, i) => {
+                        await asyncFn();
+                        
+                        if (i % 2 === 0) {
+                            throw new Error();
+                        }
+
+                        sum += i + 1;
+                    }, 1000);
+                    expect(sum).to.equal(manyErrorsSum);
+                    expect(erroredItems.length).to.equal(manyErrorsTotal);
+                });
+            });
         });
     });
 
-    describe('should thoroghly expose nested callback to calling function', () => {
-        it('sync', () => {
-            peach([], () => {}, 20);
-
-            expect(true).to.equal(true);
-        });
-
-        it('async', async () => {
-            await peach([], () => {}, 20);
-
-            expect(true).to.equal(true);
-        });
+    describe('should thoroughly expose nested callback error to calling function', () => {
+        
     });
 
     describe('should do nothing for null or undefined args', () => {
-        it('sync', () => {
-            peach([], () => {}, 20);
-
-            expect(true).to.equal(true);
-        });
-
-        it('async', async () => {
-            await peach([], () => {}, 20);
-
-            expect(true).to.equal(true);
-        });
+        
     });
 
     describe('should process sequentially if chunkSize = 1', () => {
-        it('sync', () => {
-            peach([], () => {}, 20);
-
-            expect(true).to.equal(true);
-        });
-
-        it('async', async () => {
-            await peach([], () => {}, 20);
-
-            expect(true).to.equal(true);
-        });
+        
     });
 
     describe('should process in parallel if chunkSize > 1', () => {
-        it('sync', () => {
-            peach([], () => {}, 20);
-
-            expect(true).to.equal(true);
-        });
-
-        it('async', async () => {
-            await peach([], () => {}, 20);
-
-            expect(true).to.equal(true);
-        });
+        
     });
 
     describe('should process entire array at once if chunkSize > array.length', () => {
-        it('sync', () => {
-            peach([], () => {}, 20);
-
-            expect(true).to.equal(true);
-        });
-
-        it('async', async () => {
-            await peach([], () => {}, 20);
-
-            expect(true).to.equal(true);
-        });
+        
     });
 });
