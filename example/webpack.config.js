@@ -1,14 +1,12 @@
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     context: path.join(__dirname),
-    //entry: ['./src/parallel-each.js', './index.js'],
-    entry: './src/parallel-each.js',
+    entry: './index.js',
     output: {
-        //filename: '[name].js',
-        filename: 'parallel-each.js',
-        publicPath: '/dist/',
+        filename: 'index.js',
         path: path.resolve(__dirname, 'dist')
     },
     module: {
@@ -19,9 +17,10 @@ module.exports = {
         }]
     },
     plugins: [
-        new CleanWebpackPlugin()
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            title: 'ES6 Parallel-Each Examples'
+        })
     ],
-    //mode: 'development',
-    //devtool: 'inline-source-map',
     mode: 'production'
 };
