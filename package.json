@@ -1,6 +1,6 @@
 {
   "name": "parallel-each",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A non-blocking, asynchronous, parallel implementation of forEach in JS",
   "main": "dist/parallel-each.js",
   "scripts": {
