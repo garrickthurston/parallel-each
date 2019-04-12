@@ -26,7 +26,7 @@ const asyncFn = () => new Promise((resolve) => {
 });
 
 var collection = [];
-for (var i = 0; i < (Math.pow(10, power)); i++) {
+for (var i = 0; i < (Math.pow(10, 3)); i++) {
     collection.push({
         index: i,
         item: `item_${i}`
@@ -60,7 +60,7 @@ const asyncErrorFn = () => new Promise((_, reject) => {
 });
 
 var collection = [];
-for (var i = 0; i < (Math.pow(10, power)); i++) {
+for (var i = 0; i < (Math.pow(10, 3)); i++) {
     collection.push({
         index: i,
         item: `item_${i}`
