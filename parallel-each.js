@@ -35,10 +35,10 @@ function ParallelEach(array, callback, chunkSize) {
     this.processCallback = (item) => new Promise((resolve, reject) => {
         Promise.resolve(this.callback(item.item, item.index, this.array)).catch((ex) => { 
             this.ee.emit('itemError', { item, ex });
-        }).finally(resolve);
+        }).then(resolve);
     }).catch((ex) => {
         this.ee.emit('itemError', { item, ex });
-    }).finally(() => {
+    }).then(() => {
         this.processArray = this.processArray.filter(val => item !== val);
         var nextIndex = null;
         if (this.availableIndexes && this.availableIndexes.length) {
