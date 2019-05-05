@@ -41,7 +41,7 @@ peach(collection, async (_, i) => {
 
     sum += i + 1;
 }, 10).then(() => {
-    var processed = (sum === actualSum);
+    var processed = (sum === actualSum); // true
 });
 ```
 
@@ -79,8 +79,8 @@ peach(collection, async (_, i) => {
 
     sum += i + 1;
 }, 10).then((erroredItems) => {
-    var errored = (erroredItems.length === collection.length / 2);
-    var processed = (sum === (actualSum / 2 + (collection.length / 4)));
+    var errored = (erroredItems.length === collection.length / 2); // true
+    var processed = (sum === (actualSum / 2 + (collection.length / 4))); // true
 });
 ```
 
