@@ -22,5 +22,6 @@ module.exports = {
             title: 'ES6 Parallel-Each Examples'
         })
     ],
-    mode: 'production'
+    devtool: 'source-map'
+    // mode: 'production'
 };

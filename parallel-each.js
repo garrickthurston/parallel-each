@@ -9,7 +9,7 @@ EventEmitter.prototype.on = function (event, listener) {
     this.events[event].push(listener);
 };
 EventEmitter.prototype.emit = function (event) {
-    var i, listeners, length, args = [].slice.call(arguments, 1);
+    let i, listeners, length, args = [].slice.call(arguments, 1);
 
     if (typeof this.events[event] === 'object') {
         listeners = this.events[event].slice();
@@ -29,10 +29,10 @@ function ParallelEach(array, callback, chunkSize) {
     this.ee = new EventEmitter();
     this.erroredItems = [];
 
-    this.processArray = this.array.slice(0, chunkSize).map((item, i) => { return { index: i, item }; });
+    this.processArray = this.array.slice(0, chunkSize).map((item, i) => ({ index: i, item }));
     this.availableIndexes = this.array.map((_, i) => i).slice(chunkSize);
 
-    this.processCallback = (item) => new Promise((resolve, reject) => {
+    this.processCallback = (item) => new Promise((resolve) => {
         Promise.resolve(this.callback(item.item, item.index, this.array)).catch((ex) => { 
             this.ee.emit('itemError', { item, ex });
         }).then(resolve);
@@ -40,7 +40,7 @@ function ParallelEach(array, callback, chunkSize) {
         this.ee.emit('itemError', { item, ex });
     }).then(() => {
         this.processArray = this.processArray.filter(val => item !== val);
-        var nextIndex = null;
+        let nextIndex = null;
         if (this.availableIndexes && this.availableIndexes.length) {
             nextIndex = this.availableIndexes.splice(0, 1)[0];
             this.processArray.push({
@@ -52,7 +52,7 @@ function ParallelEach(array, callback, chunkSize) {
         this.ee.emit('itemComplete', nextIndex);
     });
 
-    this.process = () => new Promise((resolve, reject) => {
+    this.process = () => new Promise((resolve) => {
         this.ee.on('itemError', (e) => {
             this.erroredItems.push({
                 item: e.item.item,
@@ -85,4 +85,4 @@ function ParallelEach(array, callback, chunkSize) {
     return this.process();
 };
 
-module.exports = ((array, callback, chunkSize = 1) => new ParallelEach(array, callback, chunkSize));
+module.exports = (array, callback, chunkSize = 1) => new ParallelEach(array, callback, chunkSize);

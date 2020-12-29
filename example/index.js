@@ -9,7 +9,7 @@ const getCollectionByPowerOf10 = (power = 1) => {
         power = 6;
     }
 
-    var collection = [];
+    const collection = [];
     for (var i = 0; i < (Math.pow(10, power)); i++) {
         collection.push({
             index: i,
@@ -32,20 +32,20 @@ const asyncErrorFn = () => new Promise((_, reject) => {
 });
 
 (async () => {
-    var startTime = (new Date()).getTime();
+    const startTime = (new Date()).getTime();
 
     ////////////////////////////////////////////////////////////////////////
     console.log('=== basic examples with sync callbacks ===');
-    var power = 4;
-    var collection = getCollectionByPowerOf10(power);
-    var actualSum = (collection.length) * (collection.length + 1) / 2;
+    let power = 4;
+    let collection = getCollectionByPowerOf10(power);
+    let actualSum = (collection.length) * (collection.length + 1) / 2;
 
-    var sum = 0;
-    var time = (new Date()).getTime();
+    let sum = 0;
+    let time = (new Date()).getTime();
     await peach(collection, (_, i) => {
         sum += i + 1;
     });
-    var elapsed = (new Date()).getTime() - time;
+    let elapsed = (new Date()).getTime() - time;
     console.log(`basic sync :: 1 parallel :: realSum :: ${actualSum}`);
     console.log(`basic sync :: 1 parallel :: calcSum :: ${sum}`);
     console.log(`basic sync :: 1 parallel :: elapsed :: ${elapsed / 1000} s`);
