@@ -20,6 +20,6 @@
     "webpack-cli": "^3.3.0"
   },
   "dependencies": {
-    "parallel-each": "^1.1.6"
+    "parallel-each": "^1.1.7"
   }
 }
