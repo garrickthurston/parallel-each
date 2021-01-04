@@ -2,11 +2,9 @@
   "name": "parallel-each",
   "version": "1.1.7",
   "description": "A parallel, asynchronous implementation of forEach in ES6 with a configurable maximum degree of parallelism.",
-  "main": "dist/parallel-each.js",
+  "main": "parallel-each.js",
   "scripts": {
-    "build": "webpack --config webpack.config.js",
-    "test": "mocha --require @babel/register --require @babel/polyfill ./test/**/*.spec.js",
-    "prepublishOnly": "npm run build"
+    "test": "mocha --require @babel/register --require @babel/polyfill ./test/**/*.spec.js"
   },
   "repository": {
     "type": "git",
@@ -49,6 +47,6 @@
     "webpack-cli": "^4.3.0"
   },
   "files": [
-    "dist/parallel-each.js"
+    "parallel-each.js"
   ]
 }
