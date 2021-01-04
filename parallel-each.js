@@ -66,7 +66,7 @@ function ParallelEach(array, callback, chunkSize) {
                 return resolve(this.erroredItems);
             }
             if (nextIndex !== null) {
-                var nextItem = this.processArray.find(item => item.index === nextIndex);
+                const nextItem = this.processArray.find(item => item.index === nextIndex);
                 if (nextItem) {
                     this.processCallback(nextItem);
                 }
@@ -74,7 +74,7 @@ function ParallelEach(array, callback, chunkSize) {
         });
 
         if (this.processArray.length) {
-            for (var i = 0; i < this.processArray.length; i++) {
+            for (let i = 0; i < this.processArray.length; i++) {
                 this.processCallback(this.processArray[i]);
             }
         } else {
